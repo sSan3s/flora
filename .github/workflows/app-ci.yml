@@ -15,9 +15,29 @@ concurrency:
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      app: ${{ steps.f.outputs.app }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: f
+        with:
+          filters: |
+            app:
+              - 'app/**'
+              - 'models.lock'
+              - 'tool/**'
+              - '.github/workflows/app-ci.yml'
+              - '.github/actions/**'
+
   check:
+    needs: changes
+    if: needs.changes.outputs.app == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
