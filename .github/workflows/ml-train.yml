@@ -1,0 +1,101 @@
+name: ml-train
+
+on:
+  workflow_dispatch:
+    inputs:
+      config:
+        description: 학습 설정 파일
+        default: ml/configs/baseline.yaml
+        required: true
+      version:
+        description: 모델 버전 (예 0.1.0). Release 태그 model-v<version>
+        required: true
+      release:
+        description: 검증 통과 시 GitHub Release 생성
+        type: boolean
+        default: true
+
+concurrency:
+  group: gpu
+  cancel-in-progress: false
+
+permissions:
+  contents: write   # release 생성
+
+env:
+  # actions/checkout 이 매번 workspace 를 git clean 함.
+  # venv / 데이터 / 학습 산출물은 workspace 밖 고정 경로에 둬야 다음 실행에도 남음.
+  # 학습 PC 에서 1회: sudo mkdir -p /srv/flora && sudo chown $USER /srv/flora
+  VENV: /srv/flora/venv
+  FLORA_DATA_DIR: /srv/flora/data
+  RUN_DIR: /srv/flora/runs/${{ inputs.version }}
+
+jobs:
+  train:
+    runs-on: [self-hosted, gpu]
+    timeout-minutes: 720
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: tag 중복 확인
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "model-v${{ inputs.version }}" >/dev/null 2>&1; then
+            echo "::error::model-v${{ inputs.version }} 이미 존재"; exit 1
+          fi
+
+      - name: gpu
+        run: nvidia-smi
+
+      - name: venv
+        run: |
+          [[ -d "$VENV" ]] || python3 -m venv "$VENV"
+          hash=$(sha256sum ml/requirements.txt | cut -c1-16)
+          if [[ "$(cat "$VENV/.req-hash" 2>/dev/null)" != "$hash" ]]; then
+            "$VENV/bin/pip" install -U pip
+            "$VENV/bin/pip" install -r ml/requirements.txt
+            echo "$hash" > "$VENV/.req-hash"
+          fi
+
+      - name: train
+        run: |
+          "$VENV/bin/python" ml/train.py --config "${{ inputs.config }}" --data-dir "$FLORA_DATA_DIR" --out "$RUN_DIR"
+
+      - name: eval
+        run: |
+          "$VENV/bin/python" ml/eval.py --run "$RUN_DIR" --data-dir "$FLORA_DATA_DIR"
+
+      - name: export tflite + 정합성 검증
+        run: |
+          "$VENV/bin/python" ml/export_tflite.py --run "$RUN_DIR" --data-dir "$FLORA_DATA_DIR"
+
+      - name: summary
+        run: |
+          {
+            echo "## model-v${{ inputs.version }}"
+            echo '```json'
+            cat "$RUN_DIR/metrics.json"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: model-${{ inputs.version }}
+          path: |
+            ${{ env.RUN_DIR }}/flower_cls.tflite
+            ${{ env.RUN_DIR }}/classes.json
+            ${{ env.RUN_DIR }}/metrics.json
+            ${{ env.RUN_DIR }}/config.yaml
+
+      - name: release
+        if: inputs.release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "model-v${{ inputs.version }}" \
+            "$RUN_DIR/flower_cls.tflite" "$RUN_DIR/classes.json" \
+            "$RUN_DIR/metrics.json" "$RUN_DIR/config.yaml" \
+            --title "model v${{ inputs.version }}" \
+            --notes-file "$RUN_DIR/release_notes.md" \
+            --target "${{ github.sha }}"

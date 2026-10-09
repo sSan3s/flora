@@ -1,0 +1,20 @@
+# MobileNetV3-Large 기본 설정. RTX 4060(8GB) 기준.
+model: mobilenetv3_large_100
+pretrained: true
+img_size: 224
+epochs: 30
+batch_size: 64
+lr: 1.0e-3
+weight_decay: 0.05
+warmup_epochs: 2
+label_smoothing: 0.1
+num_workers: 4
+patience: 6
+seed: 42
+# 4060(Ada)은 텐서코어로 FP16 이 빠름. 1050Ti 같은 Pascal 소비자 GPU 로 돌릴 땐 false (FP16 이 1/64 속도)
+amp: true
+
+export:
+  max_mb: 30          # 앱 번들 상한
+  verify_samples: 300 # torch vs tflite 비교할 val 이미지 수
+  min_agreement: 0.99 # top-1 일치율 이 값 미만이면 실패

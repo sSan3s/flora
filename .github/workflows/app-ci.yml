@@ -1,0 +1,48 @@
+name: app-ci
+
+on:
+  pull_request:
+    paths:
+      - "app/**"
+      - "models.lock"
+      - "tool/**"
+      - ".github/workflows/app-ci.yml"
+      - ".github/actions/**"
+
+concurrency:
+  group: app-ci-${{ github.head_ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-flutter
+        with:
+          github-token: ${{ github.token }}
+
+      - name: format
+        run: dart format --output=none --set-exit-if-changed lib test
+
+      - name: analyze
+        run: flutter analyze --no-fatal-infos
+
+      - name: test
+        run: flutter test --coverage
+
+      - name: coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: app/coverage/lcov.info
+          if-no-files-found: ignore

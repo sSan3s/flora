@@ -1,0 +1,4 @@
+# 앱이 번들하는 모델. ml-train 워크플로가 만든 GitHub Release 태그.
+# none 이면 tool/fetch_models.sh 가 아무것도 받지 않음 (첫 모델 나오기 전 상태).
+release: none
+# release: model-v0.1.0

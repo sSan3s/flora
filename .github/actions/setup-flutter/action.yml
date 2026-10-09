@@ -1,0 +1,36 @@
+name: setup-flutter
+description: app/pubspec.yaml 에 고정된 Flutter 버전 설치 + pub get + 모델 fetch
+inputs:
+  fetch-models:
+    description: models.lock 기준으로 tflite 를 받아올지
+    default: "true"
+  github-token:
+    description: gh release download 용 토큰
+    required: true
+runs:
+  using: composite
+  steps:
+    - uses: subosito/flutter-action@v2
+      with:
+        channel: stable
+        flutter-version-file: app/pubspec.yaml
+        cache: true
+
+    - name: pub cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.pub-cache
+        key: pub-${{ runner.os }}-${{ hashFiles('app/pubspec.lock') }}
+        restore-keys: pub-${{ runner.os }}-
+
+    - name: pub get
+      shell: bash
+      working-directory: app
+      run: flutter pub get
+
+    - name: fetch models
+      if: inputs.fetch-models == 'true'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: bash tool/fetch_models.sh

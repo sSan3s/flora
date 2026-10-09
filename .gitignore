@@ -1,0 +1,25 @@
+# flutter
+app/build/
+app/.dart_tool/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/ios/Pods/
+app/ios/.symlinks/
+app/android/key.properties
+app/android/app/*.jks
+app/assets/models/*
+!app/assets/models/.gitkeep
+
+# ml
+ml/.venv/
+ml/data/raw/
+ml/data/processed/
+ml/runs/
+__pycache__/
+*.pyc
+
+# os / ide
+.DS_Store
+.idea/
+.vscode/
+.ruff_cache/
