@@ -54,7 +54,7 @@ jobs:
         working-directory: app
         run: flutter build appbundle --release --build-number=${{ github.run_number }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: aab-${{ github.run_number }}
           path: app/build/app/outputs/bundle/release/app-release.aab

@@ -41,7 +41,7 @@ jobs:
 
       - name: coverage artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: coverage
           path: app/coverage/lcov.info

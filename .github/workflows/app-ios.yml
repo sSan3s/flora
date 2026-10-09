@@ -62,7 +62,7 @@ jobs:
             --build-number=${{ github.run_number }} \
             --export-options-plist=ios/ExportOptions.plist
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: ipa-${{ github.run_number }}
           path: app/build/ios/ipa/*.ipa
