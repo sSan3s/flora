@@ -11,7 +11,7 @@ import json
 import sys
 from pathlib import Path
 
-import ai_edge_torch
+import litert_torch
 import numpy as np
 import torch
 from torch import nn
@@ -46,7 +46,7 @@ def main():
 
     deploy = Deploy(model).eval()
     sample = (torch.zeros(1, size, size, 3),)
-    edge = ai_edge_torch.convert(deploy, sample)
+    edge = litert_torch.convert(deploy, sample)
     out = run / "flower_cls.tflite"
     edge.export(str(out))
     mb = out.stat().st_size / 1e6

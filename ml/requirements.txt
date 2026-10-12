@@ -1,5 +1,5 @@
-# torch 버전은 ai-edge-torch 가 요구하는 범위로 pip 가 맞춰줌. 충돌 나면 ai-edge-torch 릴리스 노트의 torch 버전으로 고정.
-ai-edge-torch
+# torch 버전은 litert-torch 가 요구하는 범위로 pip 가 맞춰줌. 충돌 나면 litert-torch 릴리스 노트의 torch 버전으로 고정.
+litert-torch
 torch
 torchvision
 timm
