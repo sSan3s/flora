@@ -35,7 +35,7 @@ jobs:
     runs-on: [self-hosted, gpu]
     timeout-minutes: 720
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: tag 중복 확인
         env:
