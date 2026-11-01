@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 45
     environment: testflight
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: tag 와 pubspec 버전 일치 확인
         if: startsWith(github.ref, 'refs/tags/v')
@@ -36,7 +36,7 @@ jobs:
           github-token: ${{ github.token }}
 
       - name: import signing cert
-        uses: apple-actions/import-codesign-certs@v3
+        uses: apple-actions/import-codesign-certs@v7
         with:
           p12-file-base64: ${{ secrets.IOS_CERT_P12_BASE64 }}
           p12-password: ${{ secrets.IOS_CERT_PASSWORD }}
@@ -62,14 +62,14 @@ jobs:
             --build-number=${{ github.run_number }} \
             --export-options-plist=ios/ExportOptions.plist
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ipa-${{ github.run_number }}
           path: app/build/ios/ipa/*.ipa
           retention-days: 14
 
       - name: upload to testflight
-        uses: apple-actions/upload-testflight-build@v1
+        uses: apple-actions/upload-testflight-build@v5
         with:
           app-path: app/build/ios/ipa/flora.ipa
           issuer-id: ${{ secrets.ASC_ISSUER_ID }}
