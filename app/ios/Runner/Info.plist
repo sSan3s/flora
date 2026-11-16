@@ -26,6 +26,10 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>꽃 사진을 찍어 종을 식별하는 데 사용합니다.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>앨범의 꽃 사진을 불러와 식별하는 데 사용합니다.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
