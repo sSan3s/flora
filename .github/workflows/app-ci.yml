@@ -23,8 +23,8 @@ jobs:
     outputs:
       app: ${{ steps.f.outputs.app }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: f
         with:
           filters: |
@@ -44,7 +44,7 @@ jobs:
       run:
         working-directory: app
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: ./.github/actions/setup-flutter
         with:
@@ -61,7 +61,7 @@ jobs:
 
       - name: coverage artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage
           path: app/coverage/lcov.info
