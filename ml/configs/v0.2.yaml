@@ -1,0 +1,19 @@
+# model-v0.2.0. 약 120종, 종당 최대 600장. RTX 4060(8GB) 기준.
+model: mobilenetv3_large_100
+pretrained: true
+img_size: 224
+epochs: 40
+batch_size: 64
+lr: 1.0e-3
+weight_decay: 0.05
+warmup_epochs: 2
+label_smoothing: 0.1
+num_workers: 6
+patience: 8
+seed: 42
+amp: true
+
+export:
+  max_mb: 30
+  verify_samples: 500
+  min_agreement: 0.99
